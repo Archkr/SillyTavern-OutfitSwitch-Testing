@@ -991,7 +991,7 @@ async function populateBuildMeta() {
         return;
     }
 
-    const fallbackNote = "A streamlined, single-character variant of Costume Switcher with automatic keyword triggers and manual overrides.";
+    const fallbackNote = "";
 
     try {
         const manifestUrl = new URL("./manifest.json", import.meta.url);
@@ -1015,12 +1015,7 @@ async function populateBuildMeta() {
             versionEl.removeAttribute("aria-label");
         }
 
-        const description = typeof manifest?.description === "string" ? manifest.description.trim() : "";
-        if (description) {
-            noteEl.textContent = description;
-        } else {
-            noteEl.textContent = fallbackNote;
-        }
+        noteEl.textContent = fallbackNote;
     } catch (error) {
         console.warn(`${logPrefix} Unable to populate build metadata`, error);
         versionEl.textContent = "Outfit Switcher";
