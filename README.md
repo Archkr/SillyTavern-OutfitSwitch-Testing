@@ -1,0 +1,2 @@
+# SillyTavern-OutfitSwitch-Testing
+t
