@@ -6,7 +6,8 @@
 - Update or add tests in the `test/` directory when you change profile persistence or detection logic.
 - Document noteworthy UI affordances or feature flags in the settings copy so users understand experimental scope.
 
-# Costume Switcher notes
+# notes
 
 - `SillyTavern-CostumeSwitch/` is my main extension, use it for reference for things like layout and UI.
 - Do not change anything in `SillyTavern-CostumeSwitch/`.
+  `ST-Helpers/` is a library released to the public for extension developers, it is to only be used to help with the development of Outfit Switcher
