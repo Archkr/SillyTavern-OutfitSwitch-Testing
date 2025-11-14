@@ -68,12 +68,12 @@ test("normalize trigger entry collects multiple trigger formats", () => {
     const entry = normalizeTriggerEntry({
         trigger: " Battle ",
         triggers: [" Fight ", "Battle", "guard"],
-        matcher: "slash",
+        matcher: "riposte",
         patterns: "strike,\n parry ",
     });
 
     assert.equal(entry.trigger, "Battle");
-    assert.deepEqual(entry.triggers, ["Battle", "Fight", "guard", "slash", "strike", "parry"]);
+    assert.deepEqual(entry.triggers, ["Battle", "Fight", "guard", "riposte", "strike", "parry"]);
 });
 
 test("normalize variant entry trims values", () => {
