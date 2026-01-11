@@ -52,7 +52,7 @@ test("ensure settings shape nests legacy fields into profile", () => {
     assert.equal(activeProfile.baseFolder, "Hero");
     assert.deepEqual(activeProfile.variants, [{ name: "Casual", folder: "casual" }]);
     assert.deepEqual(activeProfile.triggers, [
-        { trigger: "Battle", triggers: ["Battle"], folder: "armor" },
+        { trigger: "Battle", triggers: ["Battle"], folder: "armor", matchMode: "contains" },
     ]);
     assert.equal("character" in activeProfile, false);
 });
@@ -103,6 +103,14 @@ test("parse trigger pattern handles literals and regex", () => {
     assert.equal(regex?.raw, "/fight\\s+mode/i");
     assert.equal(regex?.regex instanceof RegExp, true);
     assert.equal(regex?.regex.flags.includes("i"), true);
+});
+
+test("parse trigger pattern honors case sensitivity toggle", () => {
+    const forcedInsensitive = parseTriggerPattern("/Battle/", { forceRegexCaseInsensitive: true });
+    assert.equal(forcedInsensitive?.regex.flags.includes("i"), true);
+
+    const sensitive = parseTriggerPattern("/Battle/", { forceRegexCaseInsensitive: false });
+    assert.equal(sensitive?.regex.flags.includes("i"), false);
 });
 
 test("parse trigger pattern returns null for invalid regex", () => {
@@ -183,6 +191,43 @@ test("find costume for text matches regex patterns", () => {
     assert.equal(match?.type, "regex");
 });
 
+test("find costume for text respects regex case settings", () => {
+    const settings = ensureSettingsShape({
+        baseFolder: "hero",
+        forceRegexCaseInsensitive: false,
+        triggers: [
+            { trigger: "/Battle/", triggers: ["/Battle/"], folder: "armor" },
+        ],
+    });
+
+    assert.equal(findCostumeForText(settings, "battle"), null);
+    assert.equal(findCostumeForText(settings, "Battle")?.costume, "hero/armor");
+});
+
+test("find costume for text respects whole word literal match mode", () => {
+    const settings = ensureSettingsShape({
+        baseFolder: "hero",
+        triggers: [
+            { trigger: "Battle", folder: "armor", matchMode: "whole" },
+        ],
+    });
+
+    assert.equal(findCostumeForText(settings, "embattled"), null);
+    assert.equal(findCostumeForText(settings, "battle plan")?.costume, "hero/armor");
+});
+
+test("find costume for text honors trigger order when overlaps occur", () => {
+    const settings = ensureSettingsShape({
+        baseFolder: "hero",
+        triggers: [
+            { trigger: "battle", folder: "armor" },
+            { trigger: "battle mode", folder: "siege" },
+        ],
+    });
+
+    assert.deepEqual(findCostumeForText(settings, "battle mode"), { costume: "hero/armor", trigger: "battle", type: "literal" });
+});
+
 test("find costume for text ignores entries without folders", () => {
     const settings = ensureSettingsShape({
         baseFolder: "",
@@ -206,4 +251,3 @@ test("build stream buffer concatenates tokens and trims to limit", () => {
     const unlimited = buildStreamBuffer("abc", "def", { limit: 0 });
     assert.equal(unlimited, "abcdef");
 });
-
